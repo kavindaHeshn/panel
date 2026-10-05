@@ -118,13 +118,64 @@
         <div class="form-group">
             <label for="mccb">MCCB (Main Breaker) Quantity:</label>
             <input type="number" id="mccb" name="mccb" value="1" min="0">
+            <select name="mcb_amp" title="Amp Rating">
+                    <option value="6A">6A</option>
+                    <option value="10A">10A</option>
+                    <option value="16A" selected>16A</option>
+                    <option value="20A">20A</option>
+                    <option value="25A">25A</option>
+                    <option value="32A">32A</option>
+                    <option value="40A">40A</option>
+                    <option value="50A">50A</option>
+                    <option value="63A">63A</option>
+                    <option value="80A">80A</option>
+                    <option value="100A">100A</option>
+                    <option value="125A">125A</option>
+                    <option value="160A">160A</option>
+                    <option value="200A">200A</option>
+                    <option value="250A">250A</option>
+                    <option value="320A">320A</option>
+                    <option value="400A">400A</option>
+                </select>
+                <select name="mccb_type" title="Poles">
+    
+                    <option value="3P" selected>3P</option>
+                    <option value="4P">4P</option>
+                </select>
         </div>
 
         <!-- RCCB -->
         <div class="form-group">
             <label for="rccb">RCCB (Earth Leakage) Quantity:</label>
             <input type="number" id="rccb" name="rccb" value="1" min="0">
+            <select name="rccb_amp" title="Amp Rating">
+                    <option value="6A">6A</option>
+                    <option value="10A">10A</option>
+                    <option value="16A" selected>16A</option>
+                    <option value="20A">20A</option>
+                    <option value="25A">25A</option>
+                    <option value="32A">32A</option>
+                    <option value="40A">40A</option>
+                    <option value="50A">50A</option>
+                    <option value="63A">63A</option>
+                    <option value="80A">80A</option>
+                    <option value="100A">100A</option>
+                    <option value="125A">125A</option>
+                    <option value="160A">160A</option>
+                    <option value="200A">200A</option>
+                    <option value="250A">250A</option>
+                    <option value="320A">320A</option>
+                    <option value="400A">400A</option>
+                </select>
+
+                <select name="rccb_type" title="Poles">
+                 
+                    <option value="2P">2P</option>
+           
+                    <option value="4P">4P</option>
+                </select>
         </div>
+        
 
         <!-- MCB with Type + Amp -->
         <div class="form-group">
@@ -182,6 +233,12 @@
             <label for="ct">Current Transformers (CT) Quantity:</label>
             <input type="number" id="ct" name="ct" value="3" min="0">
         </div>
+ <div class="form-group">
+            <label for="fuse">Fuse Quantity:</label>
+            <input type="number" id="fuse" name="fuse" value="3" min="0">
+        </div>
+
+        
 
         <!-- Indicators -->
         <div class="form-group">
@@ -192,73 +249,15 @@
         <button type="submit" name="generate">Generate Wiring Scheme</button>
     </form>
 
-    <?php
-    if (isset($_POST['generate'])) {
-        $mccb       = intval($_POST['mccb']);
-        $rccb       = intval($_POST['rccb']);
-        $mcb        = intval($_POST['mcb']);
-        $mcb_type   = $_POST['mcb_type'];
-        $mcb_amp    = $_POST['mcb_amp'];
-        $changeover = intval($_POST['changeover']);
-        $pfr        = intval($_POST['pfr']);
-        $ct         = intval($_POST['ct']);
-        $indicators = intval($_POST['indicators']);
-
-        echo "<div class='result-box'>";
-        echo "<h3>Panel Wiring Scheme & Connection Sequence</h3>";
-        echo "<ul>";
-
-        // 1. Incoming
-        if ($mccb > 0) {
-            echo "<li><strong>1. Main Incoming Supply:</strong> Connect the Main Incoming Supply (R, Y, B, N) first to the <strong>MCCB ({$mccb})</strong>.</li>";
-        }
-
-        // 2. Change Over
-        if ($changeover > 0) {
-            echo "<li><strong>2. Change-Over Switch:</strong> Install the <strong>Change-Over Switch</strong> after the MCCB.  
-            One side is fed from Mains (through MCCB) and the other side from Generator / Alternate Source.  
-            Output of Change-Over goes to the rest of the panel.</li>";
-        }
-
-        // 3. Phase Indicators
-        if ($indicators > 0) {
-            echo "<li><strong>3. Phase Indication:</strong> Take three phases from MCCB / Change-Over output and connect them through <strong>Phase Indicators ({$indicators})</strong> to Neutral to show live voltage status.</li>";
-        }
-
-        // 4. CT
-        if ($ct > 0) {
-            echo "<li><strong>4. Metering (Current Transformers):</strong> Mount <strong>Current Transformers ({$ct})</strong> on the main phase lines and connect secondary wires to Digital Ammeter / Multifunction Meter.</li>";
-        }
-
-        // 5. PFR
-        if ($pfr > 0) {
-            echo "<li><strong>5. Phase Failure Protection:</strong> Connect R, Y, B lines to the <strong>Phase Failure Relay (PFR)</strong>. Use its control contacts to trip / control the main contactor or alarm circuit.</li>";
-        }
-
-        // 6. RCCB
-        if ($rccb > 0) {
-            echo "<li><strong>6. Earth Leakage Protection:</strong> After MCCB / Change-Over, feed power to the <strong>RCCB ({$rccb})</strong> for residual current / earth leakage protection.</li>";
-        }
-
-        // 7. Outgoing MCBs
-        if ($mcb > 0) {
-            echo "<li><strong>7. Outgoing Distribution:</strong> From RCCB output (or directly from busbar), distribute power to <strong>{$mcb} Nos. of {$mcb_type} {$mcb_amp} MCBs</strong>.  
-            Connect the load / outgoing cables from these MCBs.</li>";
-        }
-
-        // 8. Earth & Neutral
-        echo "<li><strong>8. Earth & Neutral Links:</strong> Terminate all Earth wires to a dedicated <strong>Earth Terminal Block</strong> and all Neutral wires to a <strong>Neutral Link / Busbar</strong>. Keep them separate and properly labelled.</li>";
-
-        echo "</ul>";
-
-        echo "<div class='note'>
-                <strong>Note:</strong> Always follow local electrical regulations and manufacturer instructions.  
-                Use proper cable sizes according to load current. Ensure correct polarity and phase sequence.
-              </div>";
-
-        echo "</div>";
-    }
-    ?>
-</div>
-</body>
-</html>
+    <div class="result-box">
+        <h3>Wiring Scheme Summary</h3>
+        <ul>
+            <li><strong>MCCB:</strong> 1 unit of 16A</li>
+            <li><strong>RCCB:</strong> 1 unit of 16A</li>
+            <li><strong>MCB:</strong> 4 units of 3P 16A</li>
+            <li><strong>Change-Over Switch:</strong> Yes (1 No.)</li>
+            <li><strong>Phase Failure Relay (PFR):</strong> Yes</li>
+            <li><strong>Current Transformers (CT):</strong> 3 units</li>
+            <li><strong>Phase Indicators (PIL):</strong> 3 units</li>
+        </ul>
+        <p class="note">Note: Ensure all components are rated appropriately for your specific application and comply with local electrical codes.</p>
